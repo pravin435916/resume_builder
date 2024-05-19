@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAuth } from "../AuthProvider";
+import { useFirebase } from "../context/firebase";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion"
 import { SlideUp } from "../animations";
@@ -8,7 +8,7 @@ const Navbar = () => {
     const popUP = () => {
         setMenu(!menu);
     }
-    const { user, handleSignOut } = useAuth();
+    const { user, handleSignOut } = useFirebase();
 
     return (
         <nav className="w-full z-10 bg-gray-200">
@@ -25,7 +25,7 @@ const Navbar = () => {
             </div>
             <AnimatePresence>
                 {
-                    menu && (
+                    user && menu && (
                         <motion.div
                            {...SlideUp}
                             onMouseLeave={() => setMenu(false)}
