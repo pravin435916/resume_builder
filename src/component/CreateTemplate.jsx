@@ -3,6 +3,7 @@ import { getStorage, ref, uploadBytes } from 'firebase/storage';
 import ImageList from './Home/ImageList';
 import { IoCloudUploadOutline } from "react-icons/io5";
 import JobRoles from './Data/JobRole';
+import Navbar from './Navbar';
 function CreateTemplate() {
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -26,6 +27,8 @@ function CreateTemplate() {
     };
 
     return (
+        <>
+        <Navbar/>
         <div className="flex gap-4 m-4 w-full h-full">
             <div className='flex flex-col items-center justify-center w-[20%] absolute  left-10 top-20'>
                 <div className="upload-box flex flex-col items-center justify-center w-72 h-96 bg-slate-400 rounded-2xl m-4">
@@ -60,6 +63,7 @@ function CreateTemplate() {
                 <ImageList />
             </div>
         </div>
+        </>
     );
 }
 

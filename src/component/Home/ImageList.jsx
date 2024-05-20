@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { listAll, getDownloadURL, ref, deleteObject } from 'firebase/storage';
-import { storage } from '../../context/firebase';
+import { storage, useFirebase } from '../../context/firebase';
 import { UploadLoader } from '../Loader/UploadLoader';
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
@@ -38,9 +38,14 @@ function ImageList() {
       console.error('Error deleting image:', error);
     }
   };
+  const firebase = useFirebase();
   const handleImageClick = (imageUrl) => {
     const imageName = imageUrl.split('/').pop(); // Extract image name from URL
-    navigate(`/image/${imageName}`);
+    if(!firebase.isLoggedIn) {
+      navigate('/auth')
+    }else{
+      navigate(`/image/${imageName}`);
+    }
   };
 
   return (
@@ -50,10 +55,10 @@ function ImageList() {
       ) : images.length > 0 ? (
         <div className='flex justify-center items-center gap-8 flex-wrap'>
           {images.map((imageUrl,i) => (
-            <div className='w-80 h-[28rem] flex justify-center items-center hover:bg-gray-500 relative' onClick={() => handleImageClick(imageUrl)} key={i}>
-              <div className='flex justify-center items-center text-white w-8 h-8 rounded-2xl bg-red-500 absolute right-2 top-2'>
+            <div title='resume template' className='w-80 h-[28rem] flex justify-center cursor-pointer items-center hover:bg-gray-300 relative' onClick={() => handleImageClick(imageUrl)} key={i}>
+              {/* <div className='flex justify-center items-center text-white w-8 h-8 rounded-2xl bg-red-500 absolute right-2 top-2'>
                 <button className='text-2xl' onClick={() => handleDeleteImage(imageUrl)}><MdDelete /></button>
-                </div>
+                </div> */}
               <img className='w-72' src={imageUrl} alt="Uploaded Image" />
             </div>
           ))}

@@ -2,6 +2,8 @@ import React from 'react'
 import './loader.css'
 export const UploadLoader = () => {
   return (
-    <span class="loader"></span>
+    <div className='w-full h-[70vh] flex justify-center items-center'>
+      <span className="loader"></span>
+    </div>
   )
 }

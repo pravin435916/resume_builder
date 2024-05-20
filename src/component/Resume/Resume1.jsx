@@ -1,14 +1,25 @@
 import React, { useState, useRef } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-
+import { FaAngleDown, FaCloudUploadAlt, FaCode, FaFileDownload, FaProjectDiagram, FaUser } from "react-icons/fa";
+import { MdDelete } from 'react-icons/md';
+import { IoAddCircle } from 'react-icons/io5';
+import { RiGraduationCapFill } from 'react-icons/ri';
+import { ImBooks } from 'react-icons/im';
+import { LiaCertificateSolid } from 'react-icons/lia';
+import Image2 from './Image2';
+import { getDownloadURL, getStorage, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
+import { storage } from '../../context/firebase';
 const Resume1 = () => {
   const [userData, setUserData] = useState({
     fullName: '',
+    role: '',
     email: '',
     phone: '',
+    education: [{ clg: '', stream: '', branch: '', startDate: '', endDate: '' }],
     experience: [{ company: '', position: '', startDate: '', endDate: '', descriptions: [''] }],
     skills: [''],
+    certification: [''],
     projects: [{ title: '', descriptions: [''] }],
   });
 
@@ -18,6 +29,26 @@ const Resume1 = () => {
     setUserData({ ...userData, [event.target.name]: event.target.value });
   };
 
+  const handleEduAdd = () => {
+    setUserData({
+      ...userData,
+      education: [...userData.education, { clg: '', stream: '', branch: '', startDate: '', endDate: '' }],
+    });
+  };
+
+  const handleEduChange = (index, event) => {
+    const updatedExperience = [...userData.education];
+    updatedExperience[index][event.target.name] = event.target.value;
+    setUserData({ ...userData, education: updatedExperience });
+  };
+
+  const handleEduDelete = (index) => {
+    const updatedExperience = [...userData.education];
+    updatedExperience.splice(index, 1);
+    setUserData({ ...userData, education: updatedExperience });
+  };
+
+  //experience
   const handleExperienceAdd = () => {
     setUserData({
       ...userData,
@@ -31,31 +62,30 @@ const Resume1 = () => {
     setUserData({ ...userData, experience: updatedExperience });
   };
 
+  const handleExperienceDelete = (index) => {
+    const updatedExperience = [...userData.experience];
+    updatedExperience.splice(index, 1);
+    setUserData({ ...userData, experience: updatedExperience });
+  };
   const handleExperienceDescriptionChange = (index, descIndex, event) => {
     const updatedExperience = [...userData.experience];
     updatedExperience[index].descriptions[descIndex] = event.target.value;
     setUserData({ ...userData, experience: updatedExperience });
   };
 
-  const handleExperienceDelete = (index) => {
-    const updatedExperience = [...userData.experience];
-    updatedExperience.splice(index, 1);
-    setUserData({ ...userData, experience: updatedExperience });
-  };
 
   const handleDescriptionAdd = (index) => {
     const updatedExperience = [...userData.experience];
     updatedExperience[index].descriptions.push('');
     setUserData({ ...userData, experience: updatedExperience });
   };
-
+  //  skills 
   const handleSkillAdd = () => {
     setUserData({
       ...userData,
       skills: [...userData.skills, ''],
     });
   };
-
   const handleSkillChange = (index, event) => {
     const updatedSkills = [...userData.skills];
     updatedSkills[index] = event.target.value;
@@ -66,6 +96,23 @@ const Resume1 = () => {
     const updatedSkills = [...userData.skills];
     updatedSkills.splice(index, 1);
     setUserData({ ...userData, skills: updatedSkills });
+  };
+  //certificates
+  const handleCertiAdd = () => {
+    setUserData({
+      ...userData,
+      certification: [...userData.certification, ''],
+    });
+  };
+  const handleCertiChange = (index, event) => {
+    const updatedSkills = [...userData.certification];
+    updatedSkills[index] = event.target.value;
+    setUserData({ ...userData, certification: updatedSkills });
+  };
+  const handleCertiDelete = (index) => {
+    const updatedSkills = [...userData.skills];
+    updatedSkills.splice(index, 1);
+    setUserData({ ...userData, certification: updatedSkills });
   };
 
   const handleProjectAdd = () => {
@@ -115,237 +162,380 @@ const Resume1 = () => {
       });
     }
   };
+  //upload
+  const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
 
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
+  const handleUpload = () => {
+    const storage = getStorage();
+    const storageRef = ref(storage, `IMAGE/${image.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, image);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        console.log(progress);
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log(url);
+          setImageUrl(url);
+        });
+      }
+    );
+  };
   return (
-    <div className="container mx-auto px-4 py-8 flex">
-      <div className="w-1/2 pr-4">
-        <h2 className="text-2xl font-bold mb-4">Resume Builder</h2>
-        <form>
-          <div className="mb-4">
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              value={userData.fullName}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={userData.email}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone</label>
-            <input
-              type="text"
-              id="phone"
-              name="phone"
-              value={userData.phone}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-            />
-          </div>
+    <div className="container mx-auto px-4 py-8 flex gap-4">
+      <div className="w-1/2 pr-4 overflow-auto mx-10">
+        <div className='flex justify-between items-center mb-4'>
+          <h2 className="text-2xl font-bold">Resume Builder</h2>
 
-          <section className="mb-4">
-            <h3 className="text-xl font-semibold mb-2">Experience</h3>
-            {userData.experience.map((exp, index) => (
-              <div key={index} className="mb-4 border p-4 rounded-md shadow-sm">
-                <div className="mb-2">
-                  <label htmlFor={`company-${index}`} className="block text-sm font-medium text-gray-700">Company</label>
-                  <input
-                    type="text"
-                    id={`company-${index}`}
-                    name="company"
-                    value={exp.company}
-                    onChange={(event) => handleExperienceChange(index, event)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  />
-                </div>
-                <div className="mb-2">
-                  <label htmlFor={`position-${index}`} className="block text-sm font-medium text-gray-700">Position</label>
-                  <input
-                    type="text"
-                    id={`position-${index}`}
-                    name="position"
-                    value={exp.position}
-                    onChange={(event) => handleExperienceChange(index, event)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  />
-                </div>
-                <div className="mb-2">
-                  <label htmlFor={`startDate-${index}`} className="block text-sm font-medium text-gray-700">Start Date</label>
-                  <input
-                    type="date"
-                    id={`startDate-${index}`}
-                    name="startDate"
-                    value={exp.startDate}
-                    onChange={(event) => handleExperienceChange(index, event)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  />
-                </div>
-                <div className="mb-2">
-                  <label htmlFor={`endDate-${index}`} className="block text-sm font-medium text-gray-700">End Date</label>
-                  <input
-                    type="date"
-                    id={`endDate-${index}`}
-                    name="endDate"
-                    value={exp.endDate}
-                    onChange={(event) => handleExperienceChange(index, event)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  />
-                </div>
-                <div className="mb-2">
-                  <h4 className="text-lg font-semibold">Descriptions</h4>
-                  {exp.descriptions.map((desc, descIndex) => (
-                    <div key={descIndex} className="flex items-center mb-2">
-                      <textarea
-                        value={desc}
-                        onChange={(event) => handleExperienceDescriptionChange(index, descIndex, event)}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                      />
-                    </div>
-                  ))}
-                  <button type="button" className="text-blue-500" onClick={() => handleDescriptionAdd(index)}>Add Description</button>
-                </div>
-                <button type="button" className="text-red-500" onClick={() => handleExperienceDelete(index)}>Delete Experience</button>
+          <div
+            onClick={handleDownloadPDF}
+            className="flex gap-2 mt-4 mx-12 cursor-pointer bg-black text-white font-bold py-2 px-4 border rounded-full"
+          >
+            <span>Download as PDF</span>
+            <span className='text-xl'><FaFileDownload /></span>
+          </div>
+        </div>
+        <form >
+          {/* Personal info */}
+          <details className='bg-white border rounded-2xl shadow-xl p-6 mb-4'>
+            <summary className='flex justify-between items-center cursor-pointer'>
+              <div className='flex gap-2 items-center text-2xl font-bold'>
+                <span><FaUser /></span>
+                <span>Personal Info</span>
               </div>
-            ))}
-            <button type="button" className="text-blue-500" onClick={handleExperienceAdd}>Add Experience</button>
+              <span><FaAngleDown /></span>
+            </summary>
+            <div className="mb-4">
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                value={userData.fullName}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
+              <input
+                type="text"
+                id="role"
+                name="role"
+                value={userData.role}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={userData.email}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone</label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                value={userData.phone}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="file" className="block text-sm font-medium text-gray-700">Photo</label>
+              <div className='flex gap-8 items-center'>
+              <input type="file" onChange={handleImageChange} />
+              <div
+                onClick={handleUpload}
+                className="flex gap-2 cursor-pointer bg-black text-white font-bold py-2 px-4 border rounded-full"
+              >
+                <span>Upload</span>
+                <span className='text-xl'><FaCloudUploadAlt /></span>
+              </div>
+              </div>
+            </div>
+          </details>
+          {/* education */}
+          <section className="mb-4">
+            <details className='bg-white border rounded-2xl shadow-xl p-6'>
+              <summary className='flex justify-between items-center cursor-pointer'>
+                <div className='flex gap-2 items-center text-2xl font-bold'>
+                  <span><RiGraduationCapFill /></span>
+                  <span>Education</span>
+                </div>
+                <span><FaAngleDown /></span>
+              </summary>
+              {userData.education.map((exp, index) => (
+                <div key={index} className="mb-4 border p-4 rounded-md shadow-sm">
+                  <div className="mb-2">
+                    <label htmlFor={`clg-${index}`} className="block text-sm font-medium text-gray-700">College</label>
+                    <input
+                      type="text"
+                      id={`clg-${index}`}
+                      name="clg"
+                      value={exp.clg}
+                      onChange={(event) => handleEduChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor={`stream-${index}`} className="block text-sm font-medium text-gray-700">Stream</label>
+                    <input
+                      type="text"
+                      id={`stream-${index}`}
+                      name="stream"
+                      value={exp.stream}
+                      onChange={(event) => handleEduChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor={`branch-${index}`} className="block text-sm font-medium text-gray-700">Branch</label>
+                    <input
+                      type="text"
+                      id={`branch-${index}`}
+                      name="branch"
+                      value={exp.branch}
+                      onChange={(event) => handleEduChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor={`startDate-${index}`} className="block text-sm font-medium text-gray-700">Start Date</label>
+                    <input
+                      type="number"
+                      id={`startDate-${index}`}
+                      name="startDate"
+                      maxLength={4}
+                      placeholder="YYYY"
+                      value={exp.startDate}
+                      onChange={(event) => handleEduChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor={`endDate-${index}`} className="block text-sm font-medium text-gray-700">End Date</label>
+                    <input
+                      type="number"
+                      id={`endDate-${index}`}
+                      name="endDate"
+                      maxLength={4}
+                      placeholder="YYYY"
+                      value={exp.endDate}
+                      onChange={(event) => handleEduChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+
+                  <button type="button" className="text-red-500" onClick={() => handleEduDelete(index)}>Delete Experience</button>
+                </div>
+              ))}
+              <button type="button" className="text-blue-500" onClick={handleEduAdd}>Add Education</button>
+            </details>
+          </section>
+          {/* experience */}
+          <section className="mb-4">
+            <details className='bg-white border rounded-2xl shadow-xl p-6'>
+              <summary className='flex justify-between items-center cursor-pointer'>
+                <div className='flex gap-2 items-center text-2xl font-bold'>
+                  {/* <span><RiGraduationCapFill /></span> */}
+                  <span><ImBooks /></span>
+                  <span>Experience</span>
+                </div>
+                <span><FaAngleDown /></span>
+              </summary>
+              {userData.experience.map((exp, index) => (
+                <div key={index} className="mb-4 border p-4 rounded-md shadow-sm">
+                  <div className="mb-2">
+                    <label htmlFor={`company-${index}`} className="block text-sm font-medium text-gray-700">Company</label>
+                    <input
+                      type="text"
+                      id={`company-${index}`}
+                      name="company"
+                      value={exp.company}
+                      onChange={(event) => handleExperienceChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor={`position-${index}`} className="block text-sm font-medium text-gray-700">Position</label>
+                    <input
+                      type="text"
+                      id={`position-${index}`}
+                      name="position"
+                      value={exp.position}
+                      onChange={(event) => handleExperienceChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor={`startDate-${index}`} className="block text-sm font-medium text-gray-700">Start Date</label>
+                    <input
+                      type="number"
+                      id={`startDate-${index}`}
+                      name="startDate"
+                      maxLength={4}
+                      placeholder="YYYY"
+                      value={exp.startDate}
+                      onChange={(event) => handleExperienceChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor={`endDate-${index}`} className="block text-sm font-medium text-gray-700">End Date</label>
+                    <input
+                      type="number"
+                      id={`endDate-${index}`}
+                      name="endDate"
+                      maxLength={4}
+                      placeholder="YYYY"
+                      value={exp.endDate}
+                      onChange={(event) => handleExperienceChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <h4 className="text-lg font-semibold">Descriptions</h4>
+                    {exp.descriptions.map((desc, descIndex) => (
+                      <div key={descIndex} className="flex items-center mb-2">
+                        <textarea
+                          value={desc}
+                          onChange={(event) => handleExperienceDescriptionChange(index, descIndex, event)}
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                        />
+                      </div>
+                    ))}
+                    <button type="button" className="text-blue-500" onClick={() => handleDescriptionAdd(index)}>Add Description</button>
+                  </div>
+                  <button type="button" className="text-red-500" onClick={() => handleExperienceDelete(index)}>Delete Experience</button>
+                </div>
+              ))}
+              <button type="button" className="text-blue-500" onClick={handleExperienceAdd}>Add Experience</button>
+            </details>
+          </section>
+          {/* skills  */}
+          <section className="mb-4">
+            <details className='bg-white border rounded-2xl shadow-xl p-6 mb-4'>
+              <summary className='flex justify-between items-center cursor-pointer'>
+                <div className='flex gap-2 items-center text-2xl font-bold'>
+                  <span><FaCode /></span>
+                  <span>Skills</span>
+                </div>
+                <span><FaAngleDown /></span>
+              </summary>
+              {userData.skills.map((skill, index) => (
+                <div key={index} className="mb-2 flex items-center">
+                  <input
+                    type="text"
+                    value={skill}
+                    onChange={(event) => handleSkillChange(index, event)}
+                    className="mt-1 block w-52 border border-gray-300 rounded-md shadow-sm p-2"
+                  />
+                  <button type="button" className="ml-2 text-red-500 text-2xl" onClick={() => handleSkillDelete(index)}><MdDelete /></button>
+                </div>
+              ))}
+              <button type="button" className="text-blue-500 text-2xl" onClick={handleSkillAdd}><IoAddCircle />
+              </button>
+            </details>
+          </section>
+          {/* projects */}
+          <section className="mb-4">
+            <details className='bg-white border rounded-2xl shadow-xl p-6 mb-4'>
+              <summary className='flex justify-between items-center cursor-pointer'>
+                <div className='flex gap-2 items-center text-2xl font-bold'>
+                  <span><FaProjectDiagram /></span>
+                  <span>Projects</span>
+                </div>
+                <span><FaAngleDown /></span>
+              </summary>
+              {userData.projects.map((project, index) => (
+                <div key={index} className="mb-4 border p-4 rounded-md shadow-sm">
+                  <div className="mb-2">
+                    <label htmlFor={`title-${index}`} className="block text-sm font-medium text-gray-700">Project Title</label>
+                    <input
+                      type="text"
+                      id={`title-${index}`}
+                      name="title"
+                      value={project.title}
+                      onChange={(event) => handleProjectChange(index, event)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <h4 className="text-lg font-semibold">Descriptions</h4>
+                    {project.descriptions.map((desc, descIndex) => (
+                      <div key={descIndex} className="flex items-center mb-2">
+                        <textarea
+                          value={desc}
+                          onChange={(event) => handleProjectDescriptionChange(index, descIndex, event)}
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                        />
+                      </div>
+                    ))}
+                    <button type="button" className="text-blue-500" onClick={() => handleProjectDescriptionAdd(index)}>Add Description</button>
+                  </div>
+                  <button type="button" className="text-red-500" onClick={() => handleProjectDelete(index)}>Delete Project</button>
+                </div>
+              ))}
+              <button type="button" className="text-blue-500" onClick={handleProjectAdd}>Add Project</button>
+            </details>
           </section>
 
           <section className="mb-4">
-            <h3 className="text-xl font-semibold mb-2">Skills</h3>
-            {userData.skills.map((skill, index) => (
-              <div key={index} className="mb-2 flex items-center">
-                <input
-                  type="text"
-                  value={skill}
-                  onChange={(event) => handleSkillChange(index, event)}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                />
-                <button type="button" className="ml-2 text-red-500" onClick={() => handleSkillDelete(index)}>Delete</button>
-              </div>
-            ))}
-            <button type="button" className="text-blue-500" onClick={handleSkillAdd}>Add Skill</button>
-          </section>
-
-          <section className="mb-4">
-            <h3 className="text-xl font-semibold mb-2">Projects</h3>
-            {userData.projects.map((project, index) => (
-              <div key={index} className="mb-4 border p-4 rounded-md shadow-sm">
-                <div className="mb-2">
-                  <label htmlFor={`title-${index}`} className="block text-sm font-medium text-gray-700">Project Title</label>
+            <details className='bg-white border rounded-2xl shadow-xl p-6 mb-4'>
+              <summary className='flex justify-between items-center cursor-pointer'>
+                <div className='flex gap-2 items-center text-2xl font-bold'>
+                  <span><LiaCertificateSolid /></span>
+                  <span>Certification</span>
+                </div>
+                <span><FaAngleDown /></span>
+              </summary>
+              {userData.certification.map((certi, index) => (
+                <div key={index} className="mb-2 flex items-center">
                   <input
                     type="text"
-                    id={`title-${index}`}
-                    name="title"
-                    value={project.title}
-                    onChange={(event) => handleProjectChange(index, event)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    value={certi}
+                    onChange={(event) => handleCertiChange(index, event)}
+                    className="mt-1 block w-96 border border-gray-300 rounded-md shadow-sm p-2"
                   />
+                  <button type="button" className="ml-2 text-red-500 text-2xl" onClick={() => handleCertiDelete(index)}><MdDelete /></button>
                 </div>
-                <div className="mb-2">
-                  <h4 className="text-lg font-semibold">Descriptions</h4>
-                  {project.descriptions.map((desc, descIndex) => (
-                    <div key={descIndex} className="flex items-center mb-2">
-                      <textarea
-                        value={desc}
-                        onChange={(event) => handleProjectDescriptionChange(index, descIndex, event)}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                      />
-                    </div>
-                  ))}
-                  <button type="button" className="text-blue-500" onClick={() => handleProjectDescriptionAdd(index)}>Add Description</button>
-                </div>
-                <button type="button" className="text-red-500" onClick={() => handleProjectDelete(index)}>Delete Project</button>
-              </div>
-            ))}
-            <button type="button" className="text-blue-500" onClick={handleProjectAdd}>Add Project</button>
+              ))}
+              <button type="button" className="text-blue-500 text-2xl" onClick={handleCertiAdd}><IoAddCircle />
+              </button>
+            </details>
           </section>
         </form>
       </div>
 
-      <div className="w-1/2 pl-4">
-        <h2 className="text-2xl font-bold mb-4">Resume Preview</h2>
-        <div ref={resumeRef} class="max-w-4xl mx-auto p-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg text-white">
-  <div class="flex items-center mb-8">
-    <div class="w-24 h-24 rounded-full overflow-hidden mr-6">
-      <img src="profile-picture.jpg" alt="Profile Picture" class="w-full h-full object-cover"/>
-    </div>
-    <div>
-      <h1 class="text-4xl font-bold">{userData.fullName}</h1>
-      <p class="text-lg">{userData.email}</p>
-      <p class="text-lg">{userData.phone}</p>
-    </div>
-  </div>
+      <div className="w-1/2 pl-4 max-h-screen overflow-auto fixed top-2 right-0 text-xs mb-6">
+        <div ref={resumeRef} class=" mx-12 p-4 rounded-lg shadow-xl m-2">
+          <Image2 userData={userData} imageUrl={imageUrl} />
+        </div>
 
-  <div class="bg-white p-6 rounded-lg shadow-md text-gray-800">
-    <h2 class="text-2xl font-semibold mb-4 text-purple-700">Experience</h2>
-    {userData.experience.map((exp, index) => (
-      <div key={index} class="mb-6">
-        <h3 class="text-xl font-semibold">{exp.position} at {exp.company}</h3>
-        <p class="text-gray-600 italic">{exp.startDate} - {exp.endDate}</p>
-        <ul class="list-disc ml-6">
-          {exp.descriptions.map((desc, descIndex) => (
-            <li key={descIndex}>{desc}</li>
-          ))}
-        </ul>
-      </div>
-    ))}
-  </div>
-
-  <div class="bg-white p-6 rounded-lg shadow-md mt-8 text-gray-800">
-    <h2 class="text-2xl font-semibold mb-4 text-purple-700">Skills</h2>
-    <ul class="list-disc ml-6">
-      {userData.skills.map((skill, index) => (
-        <li key={index}>{skill}</li>
-      ))}
-    </ul>
-  </div>
-
-  <div class="bg-white p-6 rounded-lg shadow-md mt-8 text-gray-800">
-    <h2 class="text-2xl font-semibold mb-4 text-purple-700">Projects</h2>
-    {userData.projects.map((project, index) => (
-      <div key={index} class="mb-6">
-        <h3 class="text-xl font-semibold">{project.title}</h3>
-        <ul class="list-disc ml-6">
-          {project.descriptions.map((desc, descIndex) => (
-            <li key={descIndex}>{desc}</li>
-          ))}
-        </ul>
-      </div>
-    ))}
-  </div>
-
-  <div class="bg-white p-6 rounded-lg shadow-md mt-8 text-gray-800">
-    <h2 class="text-2xl font-semibold mb-4 text-purple-700">Education</h2>
-    {/* <div class="mb-6">
-      <h3 class="text-xl font-semibold">{userData.education.university}</h3>
-      <p class="text-gray-600 italic">{userData.education.degree}, Class of {userData.education.graduationYear}</p>
-      <ul class="list-disc ml-6">
-        {userData.education.details.map((detail, index) => (
-          <li key={index}>{detail}</li>
-        ))}
-      </ul>
-    </div> */}
-  </div>
-</div>
-
-        <button 
-          onClick={handleDownloadPDF}
-          className="mt-4 bg-green-500 text-white py-2 px-4 rounded"
-        >
-          Download as PDF
-        </button>
       </div>
     </div>
   );
