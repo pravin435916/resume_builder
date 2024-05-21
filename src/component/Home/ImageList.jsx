@@ -19,7 +19,6 @@ function ImageList() {
         );
         Promise.all(imageUrls).then((urls) => {
           setImages(urls);
-          console.log(urls)
 
           setIsLoading(false); // Set loading to false after successful fetch
         });

@@ -13,9 +13,11 @@ import {
 import { getFirestore } from "firebase/firestore";
 
 // Firebase configuration
+
 const firebaseConfig = {
     apiKey: "AIzaSyAKIGET9Jl13kAn5cK6GTXM_A8xaX9QzEY",
     authDomain: "resumebuilder-c949c.firebaseapp.com",
+    databaseURL: "https://resumebuilder-c949c-default-rtdb.firebaseio.com",
     projectId: "resumebuilder-c949c",
     storageBucket: "resumebuilder-c949c.appspot.com",
     messagingSenderId: "1071530901076",

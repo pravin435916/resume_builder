@@ -532,7 +532,7 @@ const Resume1 = () => {
       </div>
 
       <div className="w-1/2 pl-4 max-h-screen overflow-auto fixed top-2 right-0 text-xs mb-6">
-        <div ref={resumeRef} class=" mx-12 p-4 rounded-lg shadow-xl m-2">
+        <div ref={resumeRef} className=" mx-12 p-4 rounded-lg shadow-xl m-2">
           <Image2 userData={userData} imageUrl={imageUrl} />
         </div>
 
