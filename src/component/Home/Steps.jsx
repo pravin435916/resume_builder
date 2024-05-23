@@ -4,7 +4,7 @@ export const Steps = () => {
   return (
     <>
     <h1 className='text-4xl font-bold text-center'>Just four simple steps to download your resume:</h1>
-    <div className='flex justify-center items-center w-full h-full gap-32 my-20'>
+    <div className='flex justify-center items-center flex-wrap w-full h-full gap-32 my-20'>
        <div className='w-40 h-52 flex flex-col justify-center items-center text-center'>
           <img className='w-full' src="/assests/one.png" alt="" />
           <span>Step 1 : Pick Up Template </span>

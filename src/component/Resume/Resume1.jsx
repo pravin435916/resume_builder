@@ -197,8 +197,8 @@ const Resume1 = () => {
     );
   };
   return (
-    <div className="container mx-auto px-4 py-8 flex gap-4">
-      <div className="w-1/2 pr-4 overflow-auto mx-10">
+    <div className="sm:container sm:mx-auto px-4 py-8 flex sm:flex-row gap-4 flex-col">
+      <div className="sm:w-1/2 w-full sm:pr-4 overflow-auto sm:mx-10">
         <div className='flex justify-between items-center mb-4'>
           <h2 className="text-2xl font-bold">Resume Builder</h2>
 
@@ -206,7 +206,7 @@ const Resume1 = () => {
             onClick={handleDownloadPDF}
             className="flex gap-2 mt-4 mx-12 cursor-pointer bg-black text-white font-bold py-2 px-4 border rounded-full"
           >
-            <span>Download as PDF</span>
+            <span className='sm:text-xl text-xs'>Download as PDF</span>
             <span className='text-xl'><FaFileDownload /></span>
           </div>
         </div>
@@ -266,11 +266,11 @@ const Resume1 = () => {
             </div>
             <div className="mb-4">
               <label htmlFor="file" className="block text-sm font-medium text-gray-700">Photo</label>
-              <div className='flex gap-8 items-center'>
+              <div className='flex sm:flex-row flex-col gap-8 items-center'>
               <input type="file" onChange={handleImageChange} />
               <div
                 onClick={handleUpload}
-                className="flex gap-2 cursor-pointer bg-black text-white font-bold py-2 px-4 border rounded-full"
+                className="flex gap-2 cursor-pointer bg-black text-white font-bold py-2 px-8 sm:px-4 border rounded-full"
               >
                 <span>Upload</span>
                 <span className='text-xl'><FaCloudUploadAlt /></span>
@@ -519,7 +519,7 @@ const Resume1 = () => {
                     type="text"
                     value={certi}
                     onChange={(event) => handleCertiChange(index, event)}
-                    className="mt-1 block w-96 border border-gray-300 rounded-md shadow-sm p-2"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   />
                   <button type="button" className="ml-2 text-red-500 text-2xl" onClick={() => handleCertiDelete(index)}><MdDelete /></button>
                 </div>
@@ -531,8 +531,8 @@ const Resume1 = () => {
         </form>
       </div>
 
-      <div className="w-1/2 pl-4 max-h-screen overflow-auto fixed top-2 right-0 text-xs mb-6">
-        <div ref={resumeRef} className=" mx-12 p-4 rounded-lg shadow-xl m-2">
+      <div className="sm:w-1/2 w-full sm:pl-4 p-0 max-h-screen overflow-auto sm:fixed relative top-2 right-0 text-xs mb-6">
+        <div ref={resumeRef} className=" sm:mx-12 p-4 rounded-lg shadow-xl m-2">
           <Image2 userData={userData} imageUrl={imageUrl} />
         </div>
 
