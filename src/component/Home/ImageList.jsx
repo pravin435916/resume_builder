@@ -40,11 +40,12 @@ function ImageList() {
   const firebase = useFirebase();
   const handleImageClick = (imageUrl) => {
     const imageName = imageUrl.split('/').pop(); // Extract image name from URL
-    if(!firebase.isLoggedIn) {
-      navigate('/auth')
-    }else{
-      navigate(`/image/${imageName}`);
-    }
+    navigate(`/image/${imageName}`);
+    // if(!firebase.isLoggedIn) {
+    //   navigate('/auth')
+    // }else{
+    //   navigate(`/image/${imageName}`);
+    // }
   };
 
   return (

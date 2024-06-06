@@ -9,7 +9,7 @@ import { ImBooks } from 'react-icons/im';
 import { LiaCertificateSolid } from 'react-icons/lia';
 import Image2 from './Image2';
 import { getDownloadURL, getStorage, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
-import { storage } from '../../context/firebase';
+import { storage, useFirebase } from '../../context/firebase';
 const Resume1 = () => {
   const [userData, setUserData] = useState({
     fullName: '',
