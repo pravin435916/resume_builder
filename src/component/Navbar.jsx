@@ -12,7 +12,7 @@ const Navbar = () => {
     const { user, handleSignOut } = useFirebase();
 
     return (
-        <nav className="w-full z-10 bg-gray-100 shadow-md overflow-hidden">
+        <nav className="w-full z-10 shadow-md overflow-hidden">
             <div className=" text-black py-4 sm:px-6 flex justify-between items-center gap-4 mx-8">
                 <img className="w-12" src="https://pro2-bar-s3-cdn-cf.myportfolio.com/3d13047a-c0fe-40bf-aeca-94fdf975291e/84193e9e-b5a2-4499-a4ec-7c4750826db0_rwc_0x614x5004x3753x5004.png?h=c79866de72d6dc2b3cc77502e03fc104" alt="" />
                 <input type="search" className="rounded-md p-2 outline-none w-24 sm:w-[50rem]" placeholder="Search..." />
@@ -35,7 +35,7 @@ const Navbar = () => {
                             {...SlideUp}
                             onMouseLeave={() => setMenu(false)}
                             className="flex justify-start items-start w-52 h-60 bg-white  absolute right-10 top-20 p-2 z-10">
-                            <div className="flex flex-col gap-6 ml-4">
+                            <div className="flex flex-col gap-4 ml-4">
                                 <div className="flex flex-col justify-center items-center gap-2">
                                     {user && (
                                         <>

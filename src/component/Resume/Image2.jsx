@@ -28,7 +28,7 @@ function Image2({ userData,imageUrl }) {
                 <section className="mb-8">
                     <div className='flex gap-2 items-center mb-2'>
                         <span className='text-xl'><RiGraduationCapFill /></span>
-                        <h2 className="text-lg font-bold"> Education</h2>
+                        {userData.education && <h2 className="text-lg font-bold"> Education</h2> }
                     </div>
                     {userData.education.map((exp, index) => (
                         <div className="mb-4" key={index}>

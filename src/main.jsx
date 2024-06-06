@@ -4,10 +4,14 @@ import App from './App.jsx'
 import './index.css'
 // import { AuthProvider } from './AuthProvider'
 import { FirebaseProvider } from './context/firebase.jsx'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <FirebaseProvider>
       <App />
+      <ToastContainer
+/>
     </FirebaseProvider>
   </React.StrictMode>,
 )

@@ -3,7 +3,7 @@ import { useFirebase } from "../context/firebase";
 import { FaGoogle, FaGithub, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
-
+import { toast } from "react-toastify";
 const Authentication = () => {
   const firebase = useFirebase();
   const [email, setEmail] = useState('');
@@ -15,6 +15,7 @@ const Authentication = () => {
     }
   },[firebase,navigate])
   const handleSubmit = async (e) => {
+    toast('Login SuccessFully')
     e.preventDefault();
     console.log("sign up");
     await firebase.signUpWithEmailAndPass(email, password);

@@ -8,10 +8,11 @@ function Home() {
   return (
     <>
       <Navbar />
-      <div className='flex flex-col gap-4 mt-10 overflow-hidden'>
+      <div className='w-full flex flex-col gap-4 mt-10 overflow-hidden'>
+        <img className='fixed top-0 left-0 w-full h-full object-cover -z-10' src="/assests/bbblurry.svg" alt="" />
         <div className="flex justify-center items-center gap-2">
           {JobRoles.map((role, index) => (
-            <div className="flex w-max h-12 gap-4 items-center justify-center" key={index}>
+            <div className="flex h-12 gap-4 items-center justify-center" key={index}>
               <span className="text-xs border rounded-lg text-white bg-gray-400 py-2 px-4" >
                 {role}
               </span>
